@@ -12,7 +12,7 @@ use App\Helpers\Toast;
 use App\Helpers\UUID;
 use App\Helpers\XLSX;
 use App\Models\Model;
-use App\Models\Visitor;
+use App\Services\AuthService;
 
 class Controller
 {
@@ -32,7 +32,7 @@ class Controller
   {
     $this->Model = new Model();
     $this->Debug = new Debug();
-    $this->Auth = new Authenticate();
+    $this->Auth = new AuthService();
     $this->Render = new Render();
     $this->XLSX = new XLSX();
     $this->UUID = new UUID();
@@ -48,40 +48,19 @@ class Controller
   {
     $this->Model->sendMail();
   }
-  public function test()
+
+
+  public function token()
   {
-    $visitor = new Visitor();
-
-    $is_admin_url = strpos($_SERVER['REQUEST_URI'], '/admin') !== false;
-
-    if (defined('SAVING_VISITOR_PERM') && SAVING_VISITOR_PERM && !$is_admin_url) {
-      $visitor->addVisitor();
-    }
-    echo $this->Render->write("public/Layout.php", [
-      "content" => $this->Render->write("public/pages/Test.php", [])
-    ]);
+    header('X-CSRF-Token: ' . $this->CSRFToken->token());
   }
 
-
+  
   public function index()
   {
     echo $this->Render->write("../../../frontend/build/index.html", []);
   }
 
-  
-  public function cookie()
-  {
-    echo $this->Render->write("public/Layout.php", [
-      "content" => $this->Render->write("public/pages/Cookie_Info.php", [])
-    ]);
-  }
-
-  public function error()
-  {
-    echo $this->Render->write("public/Layout.php", [
-      "content" => $this->Render->write("public/pages/404.php", [])
-    ]);
-  }
 
 
   public function createResetUrl($tokenData)
@@ -135,5 +114,10 @@ class Controller
   {
     $expiryTime = time() + ($expiry);
     setcookie($name, $value, $expiryTime, "/");
+  }
+
+  public function initializePOST()
+  {
+    $_POST = json_decode(file_get_contents('php://input'), true);
   }
 }

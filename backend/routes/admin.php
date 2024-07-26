@@ -4,16 +4,6 @@ use App\Controllers\AdminRender;
 
 // route_group -> /admin
 
-
-//Renders
-$r->addRoute('GET', '', [AdminController::class, 'loginPage']);
-$r->addRoute('GET', '/dashboard', [AdminController::class, 'index']);
-$r->addRoute('GET', '/table', [AdminController::class, 'table']);
-$r->addRoute('GET', '/form', [AdminController::class, 'form']);
-$r->addRoute('GET', '/settings', [AdminController::class, 'settings']);
-$r->addRoute('GET', '/mailbox', [AdminController::class, 'mailbox']);
-
-
 // Operations
 
 $r->addRoute('POST', '/login', [AdminController::class, 'login']);

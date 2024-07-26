@@ -10,12 +10,12 @@ class AuthService
 {
   public function generateAccessToken($user)
   {
-    $key = $_SERVER["JWT_TOKEN_SECRET"];
+    $key = $_SERVER["JWT_SECRET"];
     $payload = [
       'sub' => $user["id"],
       "email" => $user["email"],
       'iat' => time(),
-      'exp' => time() + 5,
+      'exp' => time() + 500,
     ];
 
 
@@ -27,7 +27,7 @@ class AuthService
 
   public function generateRefreshToken($user)
   {
-    $key = $_SERVER["JWT_TOKEN_SECRET"];
+    $key = $_SERVER["JWT_SECRET"];
     $payload = [
       'sub' => $user["id"],
       "email" => $user["email"],
@@ -55,7 +55,7 @@ class AuthService
 
     $isFound = preg_match(
       '/Bearer\s(\S+)/',
-      $headers['authorization'] ?? '',
+      $headers['Authorization'] ?? '',
       $matches
     );
     if (!$isFound) {
@@ -70,7 +70,7 @@ class AuthService
   public function decodeJwtOrSendErrorResponse($token)
   {
     try {
-      $decoded = JWT::decode($token, new Key($_SERVER["JWT_TOKEN_SECRET"], 'HS256'));
+      $decoded = JWT::decode($token, new Key($_SERVER["JWT_SECRET"], 'HS256'));
       return (array)$decoded;
     } catch (\Firebase\JWT\ExpiredException $err) {
       http_response_code(403);
@@ -89,7 +89,7 @@ class AuthService
     $refreshToken = $_COOKIE["refreshToken"];
     $decoded = self::decodeJwtOrSendErrorResponse($refreshToken);
 
-    $key = $_SERVER["JWT_TOKEN_SECRET"];
+    $key = $_SERVER["JWT_SECRET"];
     $payload = [
       'sub' => $decoded["sub"],
       "email" => $decoded["email"],
